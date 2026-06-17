@@ -1,16 +1,19 @@
 package com.gugas749.abyssbubbles;
 
-import com.gugas749.abyssbubbles.bubble.BubbleManager;
-import com.gugas749.abyssbubbles.bubble.BubbleSavedData;
-import com.gugas749.abyssbubbles.command.BubbleCommand;
-import com.gugas749.abyssbubbles.network.BubbleNetwork;
+import com.gugas749.abyssbubbles.commands.ABModCommands;
+import com.gugas749.abyssbubbles.data.ModAttachments;
 import com.mojang.logging.LogUtils;
+import net.minecraft.client.Minecraft;
 import net.neoforged.bus.api.IEventBus;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.ModContainer;
+import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.config.ModConfig;
+import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.event.server.ServerStartedEvent;
-import net.neoforged.neoforge.event.server.ServerStoppingEvent;
+import net.neoforged.neoforge.event.server.ServerStartingEvent;
 import org.slf4j.Logger;
 
 @Mod(Abyssbubbles.MODID)
@@ -18,25 +21,8 @@ public class Abyssbubbles {
     public static final String MODID = "abyssbubbles";
     public static final Logger LOGGER = LogUtils.getLogger();
 
-    public Abyssbubbles(IEventBus modEventBus) {
-        modEventBus.addListener(this::commonSetup);
-        BubbleNetwork.register(modEventBus);
-
-        NeoForge.EVENT_BUS.addListener(this::onServerStarted);
-        NeoForge.EVENT_BUS.addListener(this::onServerStopping);
-        NeoForge.EVENT_BUS.register(BubbleCommand.class);
-    }
-
-    private void commonSetup(FMLCommonSetupEvent event) {
-        BubbleManager.init();
-    }
-
-    private void onServerStarted(ServerStartedEvent event) {
-        BubbleManager.setServer(event.getServer());
-        BubbleSavedData.get(event.getServer());
-    }
-
-    private void onServerStopping(ServerStoppingEvent event) {
-        BubbleSavedData.markDirty(event.getServer());
+    public Abyssbubbles(IEventBus modEventBus, ModContainer modContainer) {
+        ModAttachments.ATTACHMENT_TYPES.register(modEventBus);
+        modContainer.registerConfig(ModConfig.Type.SERVER, AbyssBubblesConfig.SPEC);
     }
 }
