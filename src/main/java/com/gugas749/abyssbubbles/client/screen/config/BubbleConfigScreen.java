@@ -12,24 +12,36 @@ import net.neoforged.neoforge.network.PacketDistributor;
 
 public class BubbleConfigScreen extends Screen {
 
-    private static final int FIELD_W = 120;
-    private static final int LABEL_COLOR = 0xFFDDDDDD;
-    private static final int ERROR_COLOR = 0xFFFF5555;
+    private static final int PANEL_PAD  = 8;
+    private static final int ROW_H      = 30;
+    private static final int FIELD_W    = 130;
+    private static final int LABEL_COL  = 0xFFDDDDDD;
+    private static final int ERROR_COL  = 0xFFFF5555;
+    private static final int HINT_COL   = 0xFF888888;
 
-    // Working values
-    private Color bgColor;
-    private Color borderColor;
-    private int textColor;
-    private double offset;
-    private double spacing;
+    // Panel geometry — computed once, shared between init() and render()
+    private static final int PANEL_X    = 0; // resolved at runtime via width
+    private static final int PANEL_W    = 240;
+    private static final int PANEL_Y    = PANEL_PAD;
+    private static final int TITLE_H    = 20; // title text + divider + gap
+    private static final int FIRST_ROW_Y = PANEL_Y + TITLE_H + PANEL_PAD; // 36
+
+    // Working state
+    private Color   bgColor;
+    private Color   borderColor;
+    private int     textColor;
+    private double  offset;
+    private double  spacing;
     private boolean hideNametag;
 
+    // Fields
     private EditBox bgColorField;
     private EditBox borderColorField;
     private EditBox textColorField;
     private EditBox offsetField;
     private EditBox spacingField;
     private EditBox importExportField;
+
     private String errorMessage = null;
 
     public BubbleConfigScreen(OpenBubbleScreenPacket packet) {
@@ -42,68 +54,55 @@ public class BubbleConfigScreen extends Screen {
         this.hideNametag = packet.hideNametag();
     }
 
+    // Convenience: panel left edge
+    private int panelX() { return width / 2 - PANEL_W / 2; }
+    private int labelX() { return panelX() + PANEL_PAD; }
+    private int fieldX() { return labelX() + 80; }
+
     @Override
     protected void init() {
-        int cx = width / 2;
-        int y = 40;
-        int rh = 28;
+        int fx = fieldX();
+        int y  = FIRST_ROW_Y;
 
-        // Background color
-        bgColorField = new EditBox(font, cx - FIELD_W / 2, y + rh, FIELD_W, 18,
-                Component.translatable("abyssbubbles.screen.bg_color"));
-        bgColorField.setMaxLength(8);
-        bgColorField.setValue(colorToHex(bgColor));
-        bgColorField.setResponder(v -> errorMessage = null);
+        bgColorField = field(fx, y, colorToHex(bgColor));
         addRenderableWidget(bgColorField);
-
-        // Border color
-        borderColorField = new EditBox(font, cx - FIELD_W / 2, y + rh * 3, FIELD_W, 18,
-                Component.translatable("abyssbubbles.screen.border_color"));
-        borderColorField.setMaxLength(8);
-        borderColorField.setValue(colorToHex(borderColor));
-        borderColorField.setResponder(v -> errorMessage = null);
+        y += ROW_H;
+        borderColorField = field(fx, y, colorToHex(borderColor));
         addRenderableWidget(borderColorField);
-
-        // Text color
-        textColorField = new EditBox(font, cx - FIELD_W / 2, y + rh * 5, FIELD_W, 18,
-                Component.translatable("abyssbubbles.screen.text_color"));
-        textColorField.setMaxLength(8);
-        textColorField.setValue(intToHex(textColor));
-        textColorField.setResponder(v -> errorMessage = null);
+        y += ROW_H;
+        textColorField = field(fx, y, intToHex(textColor));
         addRenderableWidget(textColorField);
+        y += ROW_H;
 
-        // Offset
-        offsetField = new EditBox(font, cx - FIELD_W / 2, y + rh * 7, FIELD_W, 18,
-                Component.translatable("abyssbubbles.screen.vertical_offset"));
+        offsetField = field(fx, y, String.valueOf(offset));
         offsetField.setMaxLength(8);
-        offsetField.setValue(String.valueOf(offset));
-        offsetField.setResponder(v -> errorMessage = null);
         addRenderableWidget(offsetField);
+        y += ROW_H;
 
-        // Spacing
-        spacingField = new EditBox(font, cx - FIELD_W / 2, y + rh * 9, FIELD_W, 18,
-                Component.translatable("abyssbubbles.screen.spacing"));
+        spacingField = field(fx, y, String.valueOf(spacing));
         spacingField.setMaxLength(6);
-        spacingField.setValue(String.valueOf(spacing));
-        spacingField.setResponder(v -> errorMessage = null);
         addRenderableWidget(spacingField);
+        y += ROW_H + PANEL_PAD;
 
-        // Import/Export
-        importExportField = new EditBox(font, cx - 100, y + rh * 11, 200, 18,
-                Component.literal("Import/Export"));
+        importExportField = new EditBox(font, panelX() + PANEL_PAD, y, PANEL_W - PANEL_PAD * 2, 16, Component.literal(""));
         importExportField.setMaxLength(512);
+        importExportField.setHint(Component.literal("Paste export string here...").withStyle(s -> s.withColor(0x888888)));
         addRenderableWidget(importExportField);
+        y += 24;
 
-        // Buttons
-        int btnY = y + rh * 13;
-        addRenderableWidget(Button.builder(Component.translatable("abyssbubbles.screen.save"),
-                btn -> save()).bounds(cx - 110, btnY, 50, 20).build());
-        addRenderableWidget(Button.builder(Component.translatable("abyssbubbles.screen.export"),
-                btn -> export()).bounds(cx - 55, btnY, 50, 20).build());
-        addRenderableWidget(Button.builder(Component.translatable("abyssbubbles.screen.import"),
-                btn -> importConfig()).bounds(cx, btnY, 50, 20).build());
-        addRenderableWidget(Button.builder(Component.translatable("abyssbubbles.screen.cancel"),
-                btn -> onClose()).bounds(cx + 55, btnY, 50, 20).build());
+        int bx = panelX() + PANEL_PAD;
+        addRenderableWidget(Button.builder(Component.translatable("abyssbubbles.screen.save"),   btn -> save()).bounds(bx,       y, 54, 18).build());
+        addRenderableWidget(Button.builder(Component.translatable("abyssbubbles.screen.export"), btn -> export()).bounds(bx + 58, y, 54, 18).build());
+        addRenderableWidget(Button.builder(Component.translatable("abyssbubbles.screen.import"), btn -> importConfig()).bounds(bx + 116, y, 54, 18).build());
+        addRenderableWidget(Button.builder(Component.translatable("abyssbubbles.screen.cancel"), btn -> onClose()).bounds(bx + 174, y, 54, 18).build());
+    }
+
+    private EditBox field(int x, int y, String value) {
+        EditBox box = new EditBox(font, x, y + 10, FIELD_W, 16, Component.literal(""));
+        box.setMaxLength(16);
+        box.setValue(value);
+        box.setResponder(v -> errorMessage = null);
+        return box;
     }
 
     // -------------------------------------------------------------------------
@@ -119,7 +118,6 @@ public class BubbleConfigScreen extends Screen {
 
     private void export() {
         if (!applyFields()) return;
-        // Simple CSV export: bgRGB,borderRGB,textInt,offset,spacing,hideNametag
         String encoded = colorToHex(bgColor) + "," + colorToHex(borderColor) + ","
                 + intToHex(textColor) + "," + offset + "," + spacing + "," + hideNametag;
         importExportField.setValue(encoded);
@@ -131,13 +129,13 @@ public class BubbleConfigScreen extends Screen {
         String raw = importExportField.getValue().trim();
         if (raw.isEmpty()) { errorMessage = "abyssbubbles.screen.error.empty_import"; return; }
         try {
-            String[] parts = raw.split(",");
-            if (parts.length != 6) throw new IllegalArgumentException();
-            bgColorField.setValue(parts[0]);
-            borderColorField.setValue(parts[1]);
-            textColorField.setValue(parts[2]);
-            offsetField.setValue(parts[3]);
-            spacingField.setValue(parts[4]);
+            String[] p = raw.split(",");
+            if (p.length != 6) throw new IllegalArgumentException();
+            bgColorField.setValue(p[0]);
+            borderColorField.setValue(p[1]);
+            textColorField.setValue(p[2]);
+            offsetField.setValue(p[3]);
+            spacingField.setValue(p[4]);
             errorMessage = null;
         } catch (Exception e) {
             errorMessage = "abyssbubbles.screen.error.invalid_import";
@@ -145,26 +143,16 @@ public class BubbleConfigScreen extends Screen {
     }
 
     private boolean applyFields() {
-        try {
-            bgColor = hexToColor(bgColorField.getValue());
-        } catch (Exception e) { errorMessage = "abyssbubbles.screen.error.invalid_bg"; return false; }
-
-        try {
-            borderColor = hexToColor(borderColorField.getValue());
-        } catch (Exception e) { errorMessage = "abyssbubbles.screen.error.invalid_border"; return false; }
-
-        try {
-            textColor = parseHexInt(textColorField.getValue());
-        } catch (Exception e) { errorMessage = "abyssbubbles.screen.error.invalid_text"; return false; }
-
-        try {
-            offset = Math.max(-2.0, Math.min(50.0, Double.parseDouble(offsetField.getValue())));
-        } catch (Exception e) { errorMessage = "abyssbubbles.screen.error.invalid_offset"; return false; }
-
-        try {
-            spacing = Math.max(1.0, Math.min(10.0, Double.parseDouble(spacingField.getValue())));
+        try { bgColor     = hexToColor(bgColorField.getValue());
+        } catch (Exception e) { errorMessage = "abyssbubbles.screen.error.invalid_bg";      return false; }
+        try { borderColor = hexToColor(borderColorField.getValue());
+        } catch (Exception e) { errorMessage = "abyssbubbles.screen.error.invalid_border";  return false; }
+        try { textColor   = parseHexInt(textColorField.getValue());
+        } catch (Exception e) { errorMessage = "abyssbubbles.screen.error.invalid_text";    return false; }
+        try { offset  = Math.max(-2.0, Math.min(50.0, Double.parseDouble(offsetField.getValue())));
+        } catch (Exception e) { errorMessage = "abyssbubbles.screen.error.invalid_offset";  return false; }
+        try { spacing = Math.max(1.0,  Math.min(10.0, Double.parseDouble(spacingField.getValue())));
         } catch (Exception e) { errorMessage = "abyssbubbles.screen.error.invalid_spacing"; return false; }
-
         return true;
     }
 
@@ -173,85 +161,80 @@ public class BubbleConfigScreen extends Screen {
     // -------------------------------------------------------------------------
 
     @Override
-    public void render(GuiGraphics gfx, int mouseX, int mouseY, float partialTick) {
-        renderBackground(gfx, mouseX, mouseY, partialTick);
-        int cx = width / 2;
-        int y = 40;
-        int rh = 28;
+    public void render(GuiGraphics g, int mx, int my, float delta) {
+        renderBackground(g, mx, my, delta);
 
-        gfx.drawCenteredString(font, title, cx, 12, 0xFFFFFFFF);
+        int px = panelX();
+        int lx = labelX();
 
-        gfx.drawString(font, Component.translatable("abyssbubbles.screen.bg_color"),     cx - FIELD_W / 2, y + rh - 10,      LABEL_COLOR, false);
-        gfx.drawString(font, Component.translatable("abyssbubbles.screen.border_color"), cx - FIELD_W / 2, y + rh * 3 - 10,  LABEL_COLOR, false);
-        gfx.drawString(font, Component.translatable("abyssbubbles.screen.text_color"),   cx - FIELD_W / 2, y + rh * 5 - 10,  LABEL_COLOR, false);
-        gfx.drawString(font, Component.translatable("abyssbubbles.screen.vertical_offset"), cx - FIELD_W / 2, y + rh * 7 - 10, LABEL_COLOR, false);
-        gfx.drawString(font, Component.translatable("abyssbubbles.screen.spacing"),      cx - FIELD_W / 2, y + rh * 9 - 10,  LABEL_COLOR, false);
-        gfx.drawString(font, Component.translatable("abyssbubbles.screen.import_export"), cx - 100,        y + rh * 11 - 10, LABEL_COLOR, false);
+        // Panel height = title + rows + import label + import field + buttons + padding
+        int panelH = TITLE_H + PANEL_PAD + 5 * ROW_H + PANEL_PAD + 10 + 24 + 22 + PANEL_PAD;
 
-        // Color previews
-        drawColorPreview(gfx, colorToArgb(bgColor),     cx + FIELD_W / 2 + 6, y + rh);
-        drawColorPreview(gfx, colorToArgb(borderColor), cx + FIELD_W / 2 + 6, y + rh * 3);
-        drawColorPreview(gfx, textColor | 0xFF000000,   cx + FIELD_W / 2 + 6, y + rh * 5);
+        g.fill(px, PANEL_Y, px + PANEL_W, PANEL_Y + panelH, 0xCC111111);
+        g.renderOutline(px, PANEL_Y, PANEL_W, panelH, 0xFF555555);
+
+        // Title + divider
+        g.drawCenteredString(font, title, width / 2, PANEL_Y + 5, 0xFFFFFF);
+        g.fill(px, PANEL_Y + 14, px + PANEL_W, PANEL_Y + 15, 0xFF555555);
+
+        // Labels — same y as fields
+        int rowY = FIRST_ROW_Y;
+        rowY = renderRow(g, lx, rowY, "abyssbubbles.screen.bg_color",        colorToArgb(bgColor));
+        rowY = renderRow(g, lx, rowY, "abyssbubbles.screen.border_color",    colorToArgb(borderColor));
+        rowY = renderRow(g, lx, rowY, "abyssbubbles.screen.text_color",      textColor | 0xFF000000);
+        rowY = renderRowNoPreview(g, lx, rowY, "abyssbubbles.screen.vertical_offset");
+        rowY = renderRowNoPreview(g, lx, rowY, "abyssbubbles.screen.spacing");
+
+        rowY += PANEL_PAD;
+        g.drawString(font, Component.translatable("abyssbubbles.screen.import_export"), lx, rowY, HINT_COL, false);
 
         if (errorMessage != null) {
-            gfx.drawCenteredString(font, Component.translatable(errorMessage),
-                    cx, y + rh * 13 + 26, ERROR_COLOR);
+            g.drawCenteredString(font, Component.translatable(errorMessage),
+                    width / 2, PANEL_Y + panelH - 6, ERROR_COL);
         }
 
-        super.render(gfx, mouseX, mouseY, partialTick);
+        super.render(g, mx, my, delta);
     }
 
-    private void drawColorPreview(GuiGraphics gfx, int argb, int x, int y) {
-        gfx.fill(x - 1, y - 1, x + 19, y + 19, 0xFF000000);
-        gfx.fill(x, y, x + 18, y + 18, argb | 0xFF000000);
+    private int renderRow(GuiGraphics g, int lx, int rowY, String key, int previewArgb) {
+        g.drawString(font, Component.translatable(key), lx, rowY, LABEL_COL, false);
+        int px = fieldX() + FIELD_W + 4;
+        g.fill(px - 1, rowY - 1, px + 13, rowY + 13, 0xFF000000);
+        g.fill(px,     rowY,     px + 12, rowY + 12, previewArgb);
+        return rowY + ROW_H;
     }
 
-    @Override
-    public boolean isPauseScreen() { return false; }
-
-    @Override
-    public void renderBackground(GuiGraphics g, int mouseX, int mouseY, float delta) {
+    private int renderRowNoPreview(GuiGraphics g, int lx, int rowY, String key) {
+        g.drawString(font, Component.translatable(key), lx, rowY, LABEL_COL, false);
+        return rowY + ROW_H;
     }
+
+    @Override public boolean isPauseScreen() { return false; }
+    @Override public void renderBackground(GuiGraphics g, int mx, int my, float delta) {}
 
     // -------------------------------------------------------------------------
     // Color helpers
     // -------------------------------------------------------------------------
 
-    /** Color (RGB floats) -> 6-char hex string */
     private static String colorToHex(Color c) {
-        int r = Math.round(c.r() * 255);
-        int g = Math.round(c.g() * 255);
-        int b = Math.round(c.b() * 255);
-        return String.format("%02X%02X%02X", r, g, b);
+        return String.format("%02X%02X%02X",
+                Math.round(c.r() * 255), Math.round(c.g() * 255), Math.round(c.b() * 255));
     }
 
     private static int colorToArgb(Color c) {
-        int r = Math.round(c.r() * 255);
-        int g = Math.round(c.g() * 255);
-        int b = Math.round(c.b() * 255);
-        return 0xFF000000 | (r << 16) | (g << 8) | b;
+        return 0xFF000000 | (Math.round(c.r() * 255) << 16) | (Math.round(c.g() * 255) << 8) | Math.round(c.b() * 255);
     }
 
-    /** 6-char hex -> Color */
     private static Color hexToColor(String hex) {
         hex = hex.trim().replace("#", "");
         if (hex.length() == 6) {
             int rgb = (int) Long.parseLong(hex, 16);
-            float r = ((rgb >> 16) & 0xFF) / 255f;
-            float g = ((rgb >> 8)  & 0xFF) / 255f;
-            float b = ( rgb        & 0xFF) / 255f;
-            return new Color(r, g, b);
+            return new Color(((rgb >> 16) & 0xFF) / 255f, ((rgb >> 8) & 0xFF) / 255f, (rgb & 0xFF) / 255f);
         }
-        throw new IllegalArgumentException("Invalid color hex: " + hex);
+        throw new IllegalArgumentException("Invalid hex: " + hex);
     }
 
-    /** int textColor -> 6 or 8 char hex */
-    private static String intToHex(int color) {
-        return String.format("%06X", color & 0xFFFFFF);
-    }
+    private static String intToHex(int color) { return String.format("%06X", color & 0xFFFFFF); }
 
-    private static int parseHexInt(String hex) {
-        hex = hex.trim().replace("#", "");
-        return (int) Long.parseLong(hex, 16);
-    }
+    private static int parseHexInt(String hex) { return (int) Long.parseLong(hex.trim().replace("#", ""), 16); }
 }
