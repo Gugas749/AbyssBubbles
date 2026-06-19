@@ -1,29 +1,4 @@
 {
-  "gui.abyssbubbles.config.title": "abyssbubbles Configuration",
-  "gui.abyssbubbles.config.tab.background": "Background",
-  "gui.abyssbubbles.config.tab.border": "Border",
-  "gui.abyssbubbles.config.tab.text": "Text",
-  "gui.abyssbubbles.config.color.red": "Red: ",
-  "gui.abyssbubbles.config.color.green": "Green: ",
-  "gui.abyssbubbles.config.color.blue": "Blue: ",
-  "gui.abyssbubbles.config.button.save": "Save",
-  "gui.abyssbubbles.config.preview": "Preview",
-  "gui.abyssbubbles.config.offset": "Offset: ",
-  "gui.abyssbubbles.config.tab.general_settings": "General Settings",
-  "gui.abyssbubbles.config.tab.color_settings": "Color Settings",
-  "gui.abyssbubbles.config.hidenametag": "Hide Nametag: %s",
-  "gui.abyssbubbles.config.hidenametag.true": "Yes",
-  "gui.abyssbubbles.config.hidenametag.false": "No",
-  "gui.abyssbubbles.config.spacing": "Spacing: ",
-  "gui.abyssbubbles.config.hexColor.tooltip": "HexCode (e.g. #FFFFFF)",
-  "gui.abyssbubbles.config.mods_list.error": "You can't do this if you're not in a world.",
-  "gui.abyssbubbles.config.button.reset": "Reset",
-  "gui.abyssbubbles.config.button.reset.tooltip": "Reset all your configuration to the default values",
-  "key.abyssbubbles.open_bubble_oonfig": "Open Settings",
-  "key.categories.abyssbubbles": "abyssbubbles",
-  "gui.abyssbubbles.config.error.not_op": "You don't have permission to edit these settings.",
-
-
   "abyssbubbles.screen.title": "Bubble Settings",
   "abyssbubbles.screen.bg_color": "Background Color (AARRGGBB)",
   "abyssbubbles.screen.border_color": "Border Color (AARRGGBB)",
@@ -49,5 +24,6 @@
   "abyssbubbles.command.usage_granted_staff": "§1[AbyssBubbles] §fGranted bubble usage to %1$s.",
   "abyssbubbles.command.usage_revoked_staff": "§1[AbyssBubbles] §fRevoked bubble usage from %1$s.",
   "abyssbubbles.command.config_granted_staff": "§1[AbyssBubbles] §fGranted bubble config access to %1$s.",
-  "abyssbubbles.command.config_revoked_staff": "§1[AbyssBubbles] §fRevoked bubble config access from %1$s."
+  "abyssbubbles.command.config_revoked_staff": "§1[AbyssBubbles] §fRevoked bubble config access from %1$s.",
+  "abyssbubbles.command.player_not_found": "§1[AbyssBubbles] §cPlayer not found."
 }

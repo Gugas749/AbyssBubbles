@@ -55,7 +55,7 @@ public class ABBubbleCommands {
         try {
             ServerPlayer player = ctx.getSource().getPlayerOrException();
             if (!BubblePermissionManager.get(ctx.getSource().getServer()).hasConfig(player.getUUID())) {
-                player.sendSystemMessage(Component.literal("§c[AbyssBubbles] You do not have permission to configure your bubble."));
+                player.sendSystemMessage(Component.translatable("abyssbubbles.command.no_config_permission"));
                 return 0;
             }
             BubbleConfigAttachment data = player.getData(ModAttachments.BUBBLE_CONFIG.get());
@@ -64,7 +64,7 @@ public class ABBubbleCommands {
                     data.getOffset(), data.getSpacing(), data.isHideNametag()));
             return 1;
         } catch (Exception e) {
-            ctx.getSource().sendFailure(Component.literal("§c[AbyssBubbles] This command can only be used by a player."));
+            ctx.getSource().sendFailure(Component.translatable("abyssbubbles.command.player_only"));
             return 0;
         }
     }
@@ -72,12 +72,12 @@ public class ABBubbleCommands {
     private static int executeGrantUsage(CommandContext<CommandSourceStack> ctx, ServerPlayer target) {
         try {
             BubblePermissionManager.get(ctx.getSource().getServer()).grantUsage(target);
-            target.sendSystemMessage(Component.literal("§1[AbyssBubbles] §fYour chat bubble has been enabled."));
+            target.sendSystemMessage(Component.translatable("abyssbubbles.command.usage_granted"));
             ctx.getSource().sendSuccess(
-                () -> Component.literal("§1[AbyssBubbles] §fGranted bubble usage to " + target.getName().getString() + "."), true);
+                () -> Component.translatable("abyssbubbles.command.usage_granted_staff", target.getName().getString()), true);
             return 1;
         } catch (Exception e) {
-            ctx.getSource().sendFailure(Component.literal("§c[AbyssBubbles] Player not found."));
+            ctx.getSource().sendFailure(Component.translatable("abyssbubbles.command.player_not_found"));
             return 0;
         }
     }
@@ -85,12 +85,12 @@ public class ABBubbleCommands {
     private static int executeGrantConfig(CommandContext<CommandSourceStack> ctx, ServerPlayer target) {
         try {
             BubblePermissionManager.get(ctx.getSource().getServer()).grantConfig(target);
-            target.sendSystemMessage(Component.literal("§1[AbyssBubbles] §fYou can now configure your bubble. Use /abyssbubbles in-game."));
+            target.sendSystemMessage(Component.translatable("abyssbubbles.command.config_granted"));
             ctx.getSource().sendSuccess(
-                () -> Component.literal("§1[AbyssBubbles] §fGranted bubble config access to " + target.getName().getString() + "."), true);
+                () -> Component.translatable("abyssbubbles.command.config_granted_staff", target.getName().getString()), true);
             return 1;
         } catch (Exception e) {
-            ctx.getSource().sendFailure(Component.literal("§c[AbyssBubbles] Player not found."));
+            ctx.getSource().sendFailure(Component.translatable("abyssbubbles.command.player_not_found"));
             return 0;
         }
     }
@@ -98,12 +98,12 @@ public class ABBubbleCommands {
     private static int executeRevokeUsage(CommandContext<CommandSourceStack> ctx, ServerPlayer target) {
         try {
             BubblePermissionManager.get(ctx.getSource().getServer()).revokeUsage(target);
-            target.sendSystemMessage(Component.literal("§1[AbyssBubbles] §fYour chat bubble has been disabled."));
+            target.sendSystemMessage(Component.translatable("abyssbubbles.command.usage_revoked"));
             ctx.getSource().sendSuccess(
-                () -> Component.literal("§1[AbyssBubbles] §fRevoked bubble usage from " + target.getName().getString() + "."), true);
+                () -> Component.translatable("abyssbubbles.command.usage_revoked_staff", target.getName().getString()), true);
             return 1;
         } catch (Exception e) {
-            ctx.getSource().sendFailure(Component.literal("§c[AbyssBubbles] Player not found."));
+            ctx.getSource().sendFailure(Component.translatable("abyssbubbles.command.player_not_found"));
             return 0;
         }
     }
@@ -111,12 +111,12 @@ public class ABBubbleCommands {
     private static int executeRevokeConfig(CommandContext<CommandSourceStack> ctx, ServerPlayer target) {
         try {
             BubblePermissionManager.get(ctx.getSource().getServer()).revokeConfig(target);
-            target.sendSystemMessage(Component.literal("§1[AbyssBubbles] §fYour bubble config access has been removed. Your settings are kept."));
+            target.sendSystemMessage(Component.translatable("abyssbubbles.command.config_revoked"));
             ctx.getSource().sendSuccess(
-                () -> Component.literal("§1[AbyssBubbles] §fRevoked bubble config access from " + target.getName().getString() + "."), true);
+                () -> Component.translatable("abyssbubbles.command.config_revoked_staff", target.getName().getString()), true);
             return 1;
         } catch (Exception e) {
-            ctx.getSource().sendFailure(Component.literal("§c[AbyssBubbles] Player not found."));
+            ctx.getSource().sendFailure(Component.translatable("abyssbubbles.command.player_not_found"));
             return 0;
         }
     }

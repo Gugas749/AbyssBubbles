@@ -1,29 +1,4 @@
 {
-  "gui.abyssbubbles.config.title": "Configuração das Chat Bubbles",
-  "gui.abyssbubbles.config.tab.background": "Fundo",
-  "gui.abyssbubbles.config.tab.border": "Borda",
-  "gui.abyssbubbles.config.tab.text": "Texto",
-  "gui.abyssbubbles.config.color.red": "Vermelho: ",
-  "gui.abyssbubbles.config.color.green": "Verde: ",
-  "gui.abyssbubbles.config.color.blue": "Azul: ",
-  "gui.abyssbubbles.config.button.save": "Salvar",
-  "gui.abyssbubbles.config.preview": "Pré-visualização",
-  "gui.abyssbubbles.config.offset": "Distância do Player: ",
-  "gui.abyssbubbles.config.tab.general_settings": "Configurações Gerais",
-  "gui.abyssbubbles.config.tab.color_settings": "Cores",
-  "gui.abyssbubbles.config.hidenametag": "Esconder Nametag: %s",
-  "gui.abyssbubbles.config.hidenametag.true": "Sim",
-  "gui.abyssbubbles.config.hidenametag.false": "Não",
-  "gui.abyssbubbles.config.spacing": "Espaçamento: ",
-  "gui.abyssbubbles.config.hexColor.tooltip": "Código Hexadecimal (Ex: #FFFFFF)",
-  "gui.abyssbubbles.config.mods_list.error": "Você não pode fazer isso fora de um mundo",
-  "gui.abyssbubbles.config.button.reset": "Reiniciar",
-  "gui.abyssbubbles.config.button.reset.tooltip": "Reinicie todos os seus valores para o padrão do servidor",
-  "key.abyssbubbles.open_bubble_oonfig": "Abrir configurações",
-  "key.categories.abyssbubbles": "abyssbubbles",
-  "gui.abyssbubbles.config.error.not_op": "Você não possui permissão para editar essas configurações.",
-
-
   "abyssbubbles.screen.title": "Configurações de Balão",
   "abyssbubbles.screen.bg_color": "Cor de Fundo (AARRGGBB)",
   "abyssbubbles.screen.border_color": "Cor da Borda (AARRGGBB)",
@@ -49,5 +24,6 @@
   "abyssbubbles.command.usage_granted_staff": "§1[AbyssBubbles] §fPermissão de uso de balão concedida a %1$s.",
   "abyssbubbles.command.usage_revoked_staff": "§1[AbyssBubbles] §fPermissão de uso de balão removida de %1$s.",
   "abyssbubbles.command.config_granted_staff": "§1[AbyssBubbles] §fAcesso de configuração de balão concedido a %1$s.",
-  "abyssbubbles.command.config_revoked_staff": "§1[AbyssBubbles] §fAcesso de configuração de balão removido de %1$s."
+  "abyssbubbles.command.config_revoked_staff": "§1[AbyssBubbles] §fAcesso de configuração de balão removido de %1$s.",
+  "abyssbubbles.command.player_not_found": "§1[AbyssBubbles] §cJogador não encontrado."
 }
