@@ -1,18 +1,16 @@
 package com.gugas749.abyssbubbles.commands;
 
 import com.gugas749.abyssbubbles.Abyssbubbles;
-import com.gugas749.abyssbubbles.commands.SubRegisters.*;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.event.RegisterCommandsEvent;
+import com.gugas749.abyssbubbles.commands.SubRegisters.ABBubbleCommands;
+import com.gugas749.abysscore.api.command.AbyssCommand;
+import com.gugas749.abysscore.api.command.AbyssCommandRegistrar;
 
-@EventBusSubscriber(modid = Abyssbubbles.MODID)
-public class ABModCommands {
+import java.util.List;
 
-    @SubscribeEvent
-    public static void onRegisterCommands(RegisterCommandsEvent event) {
-        Abyssbubbles.LOGGER.info("[AbyssBubbles] Registering commands...");
+public class ABModCommands extends AbyssCommandRegistrar {
 
-        ABBubbleCommands.register(event.getDispatcher());
+    @Override
+    protected List<AbyssCommand> commands() {
+        return List.of(ABBubbleCommands::register);
     }
 }

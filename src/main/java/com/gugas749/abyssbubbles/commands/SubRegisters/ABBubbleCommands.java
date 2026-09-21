@@ -5,6 +5,8 @@ import com.gugas749.abyssbubbles.commands.BubblePermissionManager;
 import com.gugas749.abyssbubbles.data.BubbleConfigAttachment;
 import com.gugas749.abyssbubbles.data.ModAttachments;
 import com.gugas749.abyssbubbles.network.OpenBubbleScreenPacket;
+import com.gugas749.abysscore.api.permission.AbyssPermissionHandler;
+import com.gugas749.abysscore.api.permission.AbyssPermissionLevel;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.context.CommandContext;
 import net.minecraft.commands.CommandSourceStack;
@@ -15,19 +17,22 @@ import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.neoforge.network.PacketDistributor;
 
 /**
+ * /bubble screen
  * /bubble grant usage <player>
  * /bubble grant config <player>
  * /bubble revoke usage <player>
  * /bubble revoke config <player>
+ *
+ * Command guard uses AbyssCore's AbyssPermissionHandler (MODERATOR level).
+ * Per-player bubble usage/config flags stay in BubblePermissionManager (bubble-specific state).
  */
 public class ABBubbleCommands {
 
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
         dispatcher.register(
             Commands.literal("bubble")
-                .requires(src -> src.hasPermission(2))
+                .requires(src -> AbyssPermissionHandler.sourceHas(src, AbyssPermissionLevel.MODERATOR))
 
-                // /bubble screen — open config screen for yourself (requires config permission)
                 .then(Commands.literal("screen")
                     .executes(ABBubbleCommands::executeScreen))
 
@@ -48,7 +53,7 @@ public class ABBubbleCommands {
                             .executes(ctx -> executeRevokeConfig(ctx, EntityArgument.getPlayer(ctx, "player"))))))
         );
 
-        Abyssbubbles.LOGGER.info("[AbyssBubbles] Registered: /bubble grant|revoke <usage|config> <player>");
+        Abyssbubbles.LOGGER.info("[AbyssBubbles] Registered: /bubble screen | grant|revoke <usage|config> <player>");
     }
 
     private static int executeScreen(CommandContext<CommandSourceStack> ctx) {

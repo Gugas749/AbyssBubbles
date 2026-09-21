@@ -1,5 +1,6 @@
 modLoader = "javafml"
 loaderVersion = "${loader_version_range}"
+issueTrackerURL = "https://github.com/Gugas749/AbyssBubbles/issues"
 license = "${mod_license}"
 
 
@@ -24,6 +25,13 @@ side = "BOTH"
 modId = "minecraft"
 type = "required"
 versionRange = "${minecraft_version_range}"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies."${mod_id}"]]
+modId = "abysscore"
+type = "required"
+versionRange = "*"
 ordering = "NONE"
 side = "BOTH"
 
