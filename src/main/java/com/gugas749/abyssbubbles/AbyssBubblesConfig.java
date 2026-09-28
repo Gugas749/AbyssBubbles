@@ -1,12 +1,12 @@
 package com.gugas749.abyssbubbles;
 
-import net.neoforged.neoforge.common.ModConfigSpec;
-import net.neoforged.neoforge.common.ModConfigSpec.Builder;
-import net.neoforged.neoforge.common.ModConfigSpec.ConfigValue;
-import net.neoforged.neoforge.common.ModConfigSpec.IntValue;
+import net.minecraftforge.common.ForgeConfigSpec;
+import net.minecraftforge.common.ForgeConfigSpec.Builder;
+import net.minecraftforge.common.ForgeConfigSpec.ConfigValue;
+import net.minecraftforge.common.ForgeConfigSpec.IntValue;
 
 public class AbyssBubblesConfig {
-   public static final ModConfigSpec SPEC;
+   public static final ForgeConfigSpec SPEC;
    public static final ConfigValue<Boolean> ONLY_OPS;
    public static final ConfigValue<Integer> MAX_BUBBLES;
    public static final IntValue BUBBLE_PADDING;

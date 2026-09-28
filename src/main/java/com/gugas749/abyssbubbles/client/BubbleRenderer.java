@@ -7,7 +7,6 @@ import com.gugas749.abyssbubbles.AbyssBubblesConfig;
 import com.gugas749.abyssbubbles.data.Bubble;
 import com.gugas749.abyssbubbles.data.BubbleConfigAttachment;
 import com.gugas749.abyssbubbles.data.BubblesAttachment;
-import com.gugas749.abyssbubbles.data.ModAttachments;
 import com.gugas749.abyssbubbles.util.Color;
 import java.util.List;
 import net.minecraft.client.Minecraft;
@@ -20,15 +19,15 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraft.world.entity.player.Player;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.client.event.RenderLivingEvent.Post;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.client.event.RenderPlayerEvent;
 import org.joml.Matrix4f;
 
-@EventBusSubscriber(modid = Abyssbubbles.MODID, value = Dist.CLIENT)
+@Mod.EventBusSubscriber(modid = Abyssbubbles.MODID, value = Dist.CLIENT)
 public class BubbleRenderer {
-   private static final ResourceLocation ATLAS = ResourceLocation.fromNamespaceAndPath(Abyssbubbles.MODID, "textures/allparts.png");
+   private static final ResourceLocation ATLAS = new ResourceLocation(Abyssbubbles.MODID, "textures/allparts.png");
    private static final float ATLAS_SIZE = 64.0F;
    private static final int B_TEX_W = 48;
    private static final int B_TEX_H = 32;
@@ -36,17 +35,21 @@ public class BubbleRenderer {
    private static final int A_W = 12;
    private static final int A_H = 7;
 
+   // Forge has a player-specific render event, so no generic RenderLivingEvent<Player, ?> is needed.
    @SubscribeEvent
-   public static void onRenderPlayer(Post<Player, ?> event) {
-      if (event.getEntity() instanceof Player player) {
+   public static void onRenderPlayer(RenderPlayerEvent.Post event) {
+      // getEntity() already returns Player here. `instanceof Player player` would be a
+      // compile error on Java 17 (pattern always true), so a plain assignment + block keeps the shape.
+      {
+         Player player = event.getEntity();
          Minecraft var42 = Minecraft.getInstance();
          if (player != var42.player || !var42.options.getCameraType().isFirstPerson()) {
-            BubblesAttachment data = (BubblesAttachment)player.getData(ModAttachments.BUBBLES.get());
+            BubblesAttachment data = ClientBubbleData.bubbles(player.getUUID());
             List<Bubble> bubbles = data.bubbles();
             if (!bubbles.isEmpty()) {
                ProfilerFiller profiler = player.level().getProfiler();
                profiler.push("abyssbubbles_render");
-               BubbleConfigAttachment config = (BubbleConfigAttachment)player.getData(ModAttachments.BUBBLE_CONFIG.get());
+               BubbleConfigAttachment config = ClientBubbleData.config(player.getUUID());
                Color bgColor = config.getBgColor();
                Color borderColor = config.getBorderColor();
                int textColor = config.getTextColor();
@@ -211,6 +214,13 @@ public class BubbleRenderer {
       }
    }
 
+   /*
+    * 1.20.1 VertexConsumer: every vertex MUST end with endVertex(), and the calls must follow the
+    * render type's vertex format order. entityTranslucent uses NEW_ENTITY:
+    *   position → color → uv (texture) → overlayCoords → uv2 (light) → normal
+    * (1.21 renamed these to addVertex/setColor/setUv/setOverlay/setLight/setNormal and
+    *  finishes the vertex automatically, which is why the old code had no endVertex.)
+    */
    private static void drawQuad(
       VertexConsumer vc,
       Matrix4f mat,
@@ -228,29 +238,33 @@ public class BubbleRenderer {
       float g,
       float b
    ) {
-      vc.addVertex(mat, x1, y1, z)
-         .setColor(r, g, b, alpha)
-         .setUv(u1 / 64.0F, v1 / 64.0F)
-         .setOverlay(OverlayTexture.NO_OVERLAY)
-         .setLight(15728880)
-         .setNormal(0.0F, 0.0F, 1.0F);
-      vc.addVertex(mat, x1, y2, z)
-         .setColor(r, g, b, alpha)
-         .setUv(u1 / 64.0F, v2 / 64.0F)
-         .setOverlay(OverlayTexture.NO_OVERLAY)
-         .setLight(15728880)
-         .setNormal(0.0F, 0.0F, 1.0F);
-      vc.addVertex(mat, x2, y2, z)
-         .setColor(r, g, b, alpha)
-         .setUv(u2 / 64.0F, v2 / 64.0F)
-         .setOverlay(OverlayTexture.NO_OVERLAY)
-         .setLight(15728880)
-         .setNormal(0.0F, 0.0F, 1.0F);
-      vc.addVertex(mat, x2, y1, z)
-         .setColor(r, g, b, alpha)
-         .setUv(u2 / 64.0F, v1 / 64.0F)
-         .setOverlay(OverlayTexture.NO_OVERLAY)
-         .setLight(15728880)
-         .setNormal(0.0F, 0.0F, 1.0F);
+      vc.vertex(mat, x1, y1, z)
+         .color(r, g, b, alpha)
+         .uv(u1 / 64.0F, v1 / 64.0F)
+         .overlayCoords(OverlayTexture.NO_OVERLAY)
+         .uv2(15728880)
+         .normal(0.0F, 0.0F, 1.0F)
+         .endVertex();
+      vc.vertex(mat, x1, y2, z)
+         .color(r, g, b, alpha)
+         .uv(u1 / 64.0F, v2 / 64.0F)
+         .overlayCoords(OverlayTexture.NO_OVERLAY)
+         .uv2(15728880)
+         .normal(0.0F, 0.0F, 1.0F)
+         .endVertex();
+      vc.vertex(mat, x2, y2, z)
+         .color(r, g, b, alpha)
+         .uv(u2 / 64.0F, v2 / 64.0F)
+         .overlayCoords(OverlayTexture.NO_OVERLAY)
+         .uv2(15728880)
+         .normal(0.0F, 0.0F, 1.0F)
+         .endVertex();
+      vc.vertex(mat, x2, y1, z)
+         .color(r, g, b, alpha)
+         .uv(u2 / 64.0F, v1 / 64.0F)
+         .overlayCoords(OverlayTexture.NO_OVERLAY)
+         .uv2(15728880)
+         .normal(0.0F, 0.0F, 1.0F)
+         .endVertex();
    }
 }

@@ -1,13 +1,12 @@
 package com.gugas749.abyssbubbles;
 
 import com.gugas749.abyssbubbles.commands.ABModCommands;
-import com.gugas749.abyssbubbles.data.ModAttachments;
+import com.gugas749.abyssbubbles.network.ModNetwork;
 import com.mojang.logging.LogUtils;
-import net.neoforged.bus.api.IEventBus;
-import net.neoforged.fml.ModContainer;
-import net.neoforged.fml.common.Mod;
-import net.neoforged.fml.config.ModConfig;
-import net.neoforged.neoforge.common.NeoForge;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.fml.ModLoadingContext;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.config.ModConfig;
 import org.slf4j.Logger;
 
 @Mod(Abyssbubbles.MODID)
@@ -16,10 +15,17 @@ public class Abyssbubbles {
     public static final String MODID = "abyssbubbles";
     public static final Logger LOGGER = LogUtils.getLogger();
 
-    public Abyssbubbles(IEventBus modEventBus, ModContainer modContainer) {
-        ModAttachments.ATTACHMENT_TYPES.register(modEventBus);
-        modContainer.registerConfig(ModConfig.Type.SERVER, AbyssBubblesConfig.SPEC);
+    // Forge 1.20.1: no-arg constructor (no IEventBus / ModContainer parameters)
+    public Abyssbubbles() {
+        // NeoForge: modContainer.registerConfig(...)  →  Forge: ModLoadingContext
+        ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, AbyssBubblesConfig.SPEC);
 
-        NeoForge.EVENT_BUS.register(new ABModCommands());
+        // Replaces ModAttachments.ATTACHMENT_TYPES.register(...) and the RegisterPayloadHandlersEvent
+        ModNetwork.register();
+
+        MinecraftForge.EVENT_BUS.register(new ABModCommands());
+
+        // ChatEvents, BubbleConfigStorage, BubbleRenderer and NametagRenderer register themselves
+        // through @Mod.EventBusSubscriber
     }
 }

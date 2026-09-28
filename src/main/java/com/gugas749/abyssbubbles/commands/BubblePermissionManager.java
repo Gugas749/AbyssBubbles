@@ -1,6 +1,5 @@
 package com.gugas749.abyssbubbles.commands;
 
-import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.StringTag;
@@ -24,12 +23,6 @@ public class BubblePermissionManager extends SavedData {
 
     private static final String DATA_NAME = "abyssbubbles_perms";
 
-    private static final Factory<BubblePermissionManager> FACTORY = new Factory<>(
-            BubblePermissionManager::new,
-            BubblePermissionManager::load,
-            null
-    );
-
     private final Set<UUID> usagePermitted = new HashSet<>();
     private final Set<UUID> configPermitted = new HashSet<>();
 
@@ -38,7 +31,11 @@ public class BubblePermissionManager extends SavedData {
     // -------------------------------------------------------------------------
 
     public static BubblePermissionManager get(MinecraftServer server) {
-        return server.overworld().getDataStorage().computeIfAbsent(FACTORY, DATA_NAME);
+        // 1.20.1: computeIfAbsent(loader, factory, name) — 1.21 wraps these in a SavedData.Factory
+        return server.overworld().getDataStorage().computeIfAbsent(
+                BubblePermissionManager::load,   // file exists → read it
+                BubblePermissionManager::new,    // no file yet → empty
+                DATA_NAME);
     }
 
     // -------------------------------------------------------------------------
@@ -79,7 +76,7 @@ public class BubblePermissionManager extends SavedData {
     // Persistence
     // -------------------------------------------------------------------------
 
-    private static BubblePermissionManager load(CompoundTag tag, HolderLookup.Provider registries) {
+    private static BubblePermissionManager load(CompoundTag tag) {  // 1.20.1: no registries parameter
         BubblePermissionManager mgr = new BubblePermissionManager();
         ListTag usage = tag.getList("usage", Tag.TAG_STRING);
         for (int i = 0; i < usage.size(); i++) mgr.usagePermitted.add(UUID.fromString(usage.getString(i)));
@@ -89,7 +86,7 @@ public class BubblePermissionManager extends SavedData {
     }
 
     @Override
-    public CompoundTag save(CompoundTag tag, HolderLookup.Provider registries) {
+    public CompoundTag save(CompoundTag tag) {
         ListTag usage = new ListTag();
         usagePermitted.forEach(uuid -> usage.add(StringTag.valueOf(uuid.toString())));
         tag.put("usage", usage);

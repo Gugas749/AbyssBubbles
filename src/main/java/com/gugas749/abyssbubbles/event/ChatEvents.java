@@ -3,15 +3,15 @@ package com.gugas749.abyssbubbles.event;
 import com.gugas749.abyssbubbles.Abyssbubbles;
 import com.gugas749.abyssbubbles.commands.BubblePermissionManager;
 import com.gugas749.abyssbubbles.network.BubblePacket;
-import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import com.gugas749.abyssbubbles.network.ModNetwork;
 import net.minecraft.server.level.ServerPlayer;
-import net.neoforged.bus.api.EventPriority;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.event.ServerChatEvent;
-import net.neoforged.neoforge.network.PacketDistributor;
+import net.minecraftforge.event.ServerChatEvent;
+import net.minecraftforge.eventbus.api.EventPriority;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.network.PacketDistributor;
 
-@EventBusSubscriber(modid = Abyssbubbles.MODID)
+@Mod.EventBusSubscriber(modid = Abyssbubbles.MODID)
 public class ChatEvents {
 
     @SubscribeEvent(priority = EventPriority.LOW, receiveCanceled = true)
@@ -22,6 +22,11 @@ public class ChatEvents {
 
         String message = event.getRawText();
         long curTime = player.level().getGameTime();
-        PacketDistributor.sendToPlayersTrackingEntityAndSelf(player, new BubblePacket(player.getUUID(), message, curTime), new CustomPacketPayload[0]);
+
+        // NeoForge: PacketDistributor.sendToPlayersTrackingEntityAndSelf(player, packet)
+        // Forge:    send through our channel with the TRACKING_ENTITY_AND_SELF target
+        ModNetwork.CHANNEL.raw().send(
+                PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> player),
+                new BubblePacket(player.getUUID(), message, curTime));
     }
 }

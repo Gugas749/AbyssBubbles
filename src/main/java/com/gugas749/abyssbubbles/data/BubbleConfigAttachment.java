@@ -45,6 +45,22 @@ public class BubbleConfigAttachment {
       this.hideNametag = hideNametag;
    }
 
+   /**
+    * Default config built from the server config values.
+    * (On NeoForge this lived in ModAttachments as the attachment's default supplier.)
+    * Forge syncs SERVER configs to clients on join, so this also works client-side in-game.
+    */
+   public static BubbleConfigAttachment createDefault() {
+      return new BubbleConfigAttachment(
+         new Color(1.0F, 1.0F, 1.0F),
+         new Color(0.0F, 0.0F, 0.0F),
+         0,
+         AbyssBubblesConfig.HIDE_NAMETAG.get(),
+         AbyssBubblesConfig.BUBBLE_OFFSET.get(),
+         AbyssBubblesConfig.BUBBLE_SPACING.get()
+      );
+   }
+
    public void resetToDefaults() {
       this.setBgColor(new Color(1.0F, 1.0F, 1.0F));
       this.setBorderColor(new Color(0.0F, 0.0F, 0.0F));

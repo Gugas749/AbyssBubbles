@@ -2,13 +2,8 @@ package com.gugas749.abyssbubbles.commands;
 
 import com.gugas749.abyssbubbles.Abyssbubbles;
 import com.gugas749.abyssbubbles.commands.SubRegisters.ABBubbleCommands;
-import com.gugas749.abysscore.api.command.AbyssCommand;
-import com.gugas749.abysscore.api.command.AbyssCommandRegistrar;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.event.RegisterCommandsEvent;
-
-import java.util.List;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.event.RegisterCommandsEvent;
 
 public class ABModCommands {
 

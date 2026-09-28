@@ -1,16 +1,9 @@
 package com.gugas749.abyssbubbles.network;
 
-import com.gugas749.abyssbubbles.Abyssbubbles;
+import com.gugas749.abysscore.api.network.AbyssPacketCodec;
 import com.gugas749.abyssbubbles.util.Color;
-import io.netty.buffer.ByteBuf;
-import net.minecraft.network.codec.ByteBufCodecs;
-import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.ResourceLocation;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.fml.loading.FMLEnvironment;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
 
+/** Server → Client: open the bubble config screen, pre-filled with the player's current settings. */
 public record OpenBubbleScreenPacket(
         Color bgColor,
         Color borderColor,
@@ -18,30 +11,26 @@ public record OpenBubbleScreenPacket(
         double offset,
         double spacing,
         boolean hideNametag
-) implements CustomPacketPayload {
+) {
 
-    public static final Type<OpenBubbleScreenPacket> TYPE =
-            new Type<>(ResourceLocation.fromNamespaceAndPath(Abyssbubbles.MODID, "open_bubble_screen"));
-
-    public static final StreamCodec<ByteBuf, OpenBubbleScreenPacket> STREAM_CODEC = StreamCodec.composite(
-            Color.STREAM_CODEC,      OpenBubbleScreenPacket::bgColor,
-            Color.STREAM_CODEC,      OpenBubbleScreenPacket::borderColor,
-            ByteBufCodecs.INT,       OpenBubbleScreenPacket::textColor,
-            ByteBufCodecs.DOUBLE,    OpenBubbleScreenPacket::offset,
-            ByteBufCodecs.DOUBLE,    OpenBubbleScreenPacket::spacing,
-            ByteBufCodecs.BOOL,      OpenBubbleScreenPacket::hideNametag,
-            OpenBubbleScreenPacket::new
+    public static final AbyssPacketCodec<OpenBubbleScreenPacket> CODEC = AbyssPacketCodec.of(
+            (buf, pkt) -> {
+                Color.write(buf, pkt.bgColor());
+                Color.write(buf, pkt.borderColor());
+                buf.writeInt(pkt.textColor());
+                buf.writeDouble(pkt.offset());
+                buf.writeDouble(pkt.spacing());
+                buf.writeBoolean(pkt.hideNametag());
+            },
+            buf -> new OpenBubbleScreenPacket(
+                    Color.read(buf),
+                    Color.read(buf),
+                    buf.readInt(),
+                    buf.readDouble(),
+                    buf.readDouble(),
+                    buf.readBoolean()
+            )
     );
-
-    @Override
-    public Type<? extends CustomPacketPayload> type() {
-        return TYPE;
-    }
-
-    public void handle(IPayloadContext ctx) {
-        if (FMLEnvironment.dist == Dist.CLIENT) {
-            ctx.enqueueWork(() ->
-                    com.gugas749.abyssbubbles.client.ClientScreenOpener.openBubbleScreen(this));
-        }
-    }
+    // The handler moved to ClientPayloadHandler.handleOpenScreen (a client-only class),
+    // so this record no longer references client code at all.
 }

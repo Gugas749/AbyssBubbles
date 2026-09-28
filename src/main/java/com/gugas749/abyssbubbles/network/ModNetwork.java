@@ -1,19 +1,37 @@
 package com.gugas749.abyssbubbles.network;
 
 import com.gugas749.abyssbubbles.Abyssbubbles;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
-import net.neoforged.neoforge.network.registration.PayloadRegistrar;
+import com.gugas749.abysscore.api.network.AbyssNetworkChannel;
+import com.gugas749.abysscore.api.network.AbyssPacketHandler;
+import net.minecraft.resources.ResourceLocation;
 
-@EventBusSubscriber(modid = Abyssbubbles.MODID)
 public class ModNetwork {
 
-    @SubscribeEvent
-    public static void register(RegisterPayloadHandlersEvent event) {
-        PayloadRegistrar registrar = event.registrar("1");
-        registrar.playToClient(BubblePacket.TYPE, BubblePacket.STREAM_CODEC, ClientPayloadHandler::handleNewBubble);
-        registrar.playToClient(OpenBubbleScreenPacket.TYPE, OpenBubbleScreenPacket.STREAM_CODEC, OpenBubbleScreenPacket::handle);
-        registrar.playToServer(BubbleConfigUpdatePacket.TYPE, BubbleConfigUpdatePacket.STREAM_CODEC, ServerPayloadHandler::handleUpdateBubbleConfig);
+    /** AbyssBubbles' own channel. Bump "1" whenever a packet's fields change. */
+    public static final AbyssNetworkChannel CHANNEL =
+            AbyssNetworkChannel.create(new ResourceLocation(Abyssbubbles.MODID, "main"), "1");
+
+    /**
+     * Called once from the mod constructor.
+     * ORDER MATTERS: each packet gets the next index; add new packets at the END.
+     */
+    public static void register() {
+        // ── S2C ── (client handlers wrapped in a Supplier: only resolved on the CLIENT)
+        AbyssPacketHandler.registerS2C(CHANNEL,
+                BubblePacket.class, BubblePacket.CODEC,
+                () -> ClientPayloadHandler::handleNewBubble);
+
+        AbyssPacketHandler.registerS2C(CHANNEL,
+                OpenBubbleScreenPacket.class, OpenBubbleScreenPacket.CODEC,
+                () -> ClientPayloadHandler::handleOpenScreen);
+
+        AbyssPacketHandler.registerS2C(CHANNEL,
+                BubbleConfigSyncPacket.class, BubbleConfigSyncPacket.CODEC,
+                () -> ClientPayloadHandler::handleConfigSync);
+
+        // ── C2S ──
+        AbyssPacketHandler.registerC2S(CHANNEL,
+                BubbleConfigUpdatePacket.class, BubbleConfigUpdatePacket.CODEC,
+                ServerPayloadHandler::handleUpdateBubbleConfig);
     }
 }

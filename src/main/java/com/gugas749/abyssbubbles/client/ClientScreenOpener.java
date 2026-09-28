@@ -3,8 +3,8 @@ package com.gugas749.abyssbubbles.client;
 import com.gugas749.abyssbubbles.client.screen.config.BubbleConfigScreen;
 import com.gugas749.abyssbubbles.network.OpenBubbleScreenPacket;
 import net.minecraft.client.Minecraft;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 @OnlyIn(Dist.CLIENT)
 public class ClientScreenOpener {

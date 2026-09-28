@@ -24,7 +24,8 @@ public class BubblesAttachment {
    public void addBubble(Bubble bubble) {
       this.bubbles.add(bubble);
       if (this.bubbles.size() > (Integer)AbyssBubblesConfig.MAX_BUBBLES.get()) {
-         this.bubbles.removeFirst();
+         // List.removeFirst() is Java 21 (SequencedCollection) — remove(0) does the same on Java 17
+         this.bubbles.remove(0);
       }
    }
 }

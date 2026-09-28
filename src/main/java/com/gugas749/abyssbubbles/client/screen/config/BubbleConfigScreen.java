@@ -8,7 +8,7 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
-import net.neoforged.neoforge.network.PacketDistributor;
+import com.gugas749.abyssbubbles.network.ModNetwork;
 
 public class BubbleConfigScreen extends Screen {
 
@@ -111,7 +111,7 @@ public class BubbleConfigScreen extends Screen {
 
     private void save() {
         if (!applyFields()) return;
-        PacketDistributor.sendToServer(new BubbleConfigUpdatePacket(
+        ModNetwork.CHANNEL.sendToServer(new BubbleConfigUpdatePacket(
                 bgColor, borderColor, textColor, offset, spacing, hideNametag));
         onClose();
     }
@@ -162,8 +162,6 @@ public class BubbleConfigScreen extends Screen {
 
     @Override
     public void render(GuiGraphics g, int mx, int my, float delta) {
-        renderBackground(g, mx, my, delta);
-
         int px = panelX();
         int lx = labelX();
 
@@ -210,7 +208,6 @@ public class BubbleConfigScreen extends Screen {
     }
 
     @Override public boolean isPauseScreen() { return false; }
-    @Override public void renderBackground(GuiGraphics g, int mx, int my, float delta) {}
 
     // -------------------------------------------------------------------------
     // Color helpers

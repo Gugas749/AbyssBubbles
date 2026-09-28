@@ -3,7 +3,8 @@ package com.gugas749.abyssbubbles.commands.SubRegisters;
 import com.gugas749.abyssbubbles.Abyssbubbles;
 import com.gugas749.abyssbubbles.commands.BubblePermissionManager;
 import com.gugas749.abyssbubbles.data.BubbleConfigAttachment;
-import com.gugas749.abyssbubbles.data.ModAttachments;
+import com.gugas749.abyssbubbles.data.BubbleConfigStorage;
+import com.gugas749.abyssbubbles.network.ModNetwork;
 import com.gugas749.abyssbubbles.network.OpenBubbleScreenPacket;
 import com.gugas749.abysscore.api.permission.AbyssPermissionHandler;
 import com.gugas749.abysscore.api.permission.AbyssPermissionLevel;
@@ -14,7 +15,6 @@ import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
-import net.neoforged.neoforge.network.PacketDistributor;
 
 /**
  * /bubble screen
@@ -63,8 +63,8 @@ public class ABBubbleCommands {
                 player.sendSystemMessage(Component.translatable("abyssbubbles.command.no_config_permission"));
                 return 0;
             }
-            BubbleConfigAttachment data = player.getData(ModAttachments.BUBBLE_CONFIG.get());
-            PacketDistributor.sendToPlayer(player, new OpenBubbleScreenPacket(
+            BubbleConfigAttachment data = BubbleConfigStorage.get(player);
+            ModNetwork.CHANNEL.sendToPlayer(player, new OpenBubbleScreenPacket(
                     data.getBgColor(), data.getBorderColor(), data.getTextColor(),
                     data.getOffset(), data.getSpacing(), data.isHideNametag()));
             return 1;

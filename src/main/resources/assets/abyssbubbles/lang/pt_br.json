@@ -25,5 +25,7 @@
   "abyssbubbles.command.usage_revoked_staff": "§1[AbyssBubbles] §fPermissão de uso de balão removida de %1$s.",
   "abyssbubbles.command.config_granted_staff": "§1[AbyssBubbles] §fAcesso de configuração de balão concedido a %1$s.",
   "abyssbubbles.command.config_revoked_staff": "§1[AbyssBubbles] §fAcesso de configuração de balão removido de %1$s.",
-  "abyssbubbles.command.player_not_found": "§1[AbyssBubbles] §cJogador não encontrado."
+  "abyssbubbles.command.player_not_found": "§1[AbyssBubbles] §cJogador não encontrado.",
+  "abyssbubbles.screen.spacing": "Espaçamento (entre balões)",
+  "abyssbubbles.screen.error.invalid_spacing": "Valor de espaçamento inválido."
 }

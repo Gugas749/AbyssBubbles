@@ -25,5 +25,7 @@
   "abyssbubbles.command.usage_revoked_staff": "§1[AbyssBubbles] §fRevoked bubble usage from %1$s.",
   "abyssbubbles.command.config_granted_staff": "§1[AbyssBubbles] §fGranted bubble config access to %1$s.",
   "abyssbubbles.command.config_revoked_staff": "§1[AbyssBubbles] §fRevoked bubble config access from %1$s.",
-  "abyssbubbles.command.player_not_found": "§1[AbyssBubbles] §cPlayer not found."
+  "abyssbubbles.command.player_not_found": "§1[AbyssBubbles] §cPlayer not found.",
+  "abyssbubbles.screen.spacing": "Spacing (between bubbles)",
+  "abyssbubbles.screen.error.invalid_spacing": "Invalid spacing value."
 }

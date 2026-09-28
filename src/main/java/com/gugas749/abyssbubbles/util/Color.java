@@ -2,14 +2,21 @@ package com.gugas749.abyssbubbles.util;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import io.netty.buffer.ByteBuf;
-import net.minecraft.network.codec.ByteBufCodecs;
-import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.FriendlyByteBuf;
 
 public record Color(float r, float g, float b) {
-   public static final StreamCodec<ByteBuf, Color> STREAM_CODEC = StreamCodec.composite(
-      ByteBufCodecs.FLOAT, Color::r, ByteBufCodecs.FLOAT, Color::g, ByteBufCodecs.FLOAT, Color::b, Color::new
-   );
+   // Forge 1.20.1 has no StreamCodec — packets write/read colors with these two helpers.
+   // Same wire format as before: three floats, r then g then b.
+   public static void write(FriendlyByteBuf buf, Color color) {
+      buf.writeFloat(color.r());
+      buf.writeFloat(color.g());
+      buf.writeFloat(color.b());
+   }
+
+   public static Color read(FriendlyByteBuf buf) {
+      return new Color(buf.readFloat(), buf.readFloat(), buf.readFloat());
+   }
+
    public static final Codec<Color> CODEC = RecordCodecBuilder.create(
       instance -> instance.group(
             Codec.FLOAT.fieldOf("r").forGetter(Color::r), Codec.FLOAT.fieldOf("g").forGetter(Color::g), Codec.FLOAT.fieldOf("b").forGetter(Color::b)
