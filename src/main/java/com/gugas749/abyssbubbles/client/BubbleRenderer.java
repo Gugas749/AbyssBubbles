@@ -35,11 +35,8 @@ public class BubbleRenderer {
    private static final int A_W = 12;
    private static final int A_H = 7;
 
-   // Forge has a player-specific render event, so no generic RenderLivingEvent<Player, ?> is needed.
    @SubscribeEvent
    public static void onRenderPlayer(RenderPlayerEvent.Post event) {
-      // getEntity() already returns Player here. `instanceof Player player` would be a
-      // compile error on Java 17 (pattern always true), so a plain assignment + block keeps the shape.
       {
          Player player = event.getEntity();
          Minecraft var42 = Minecraft.getInstance();
@@ -60,7 +57,11 @@ public class BubbleRenderer {
                poseStack.translate(0.0, player.getBbHeight() + offset, 0.0);
                poseStack.mulPose(var42.getEntityRenderDispatcher().cameraOrientation());
                float scale = 0.025F;
-               poseStack.scale(scale, -scale, scale);
+               // 1.20.1: X must be NEGATIVE, same as vanilla's nametag renderer.
+               // (1.20.5+ turned the camera orientation 180°, which is why the 1.21 code used +X.
+               //  With +X on 1.20.1 everything is seen from behind: the bubble still shows because
+               //  entityTranslucent draws both sides, but text render types cull back faces → invisible.)
+               poseStack.scale(-scale, -scale, scale);
                float currentY = 0.0F;
                double spacing = config.getSpacing();
                int B_PADDING = (Integer)AbyssBubblesConfig.BUBBLE_PADDING.get();
@@ -130,53 +131,53 @@ public class BubbleRenderer {
    }
 
    private static void renderBubble(
-      VertexConsumer vertexConsumer,
-      Matrix4f matrix4f,
-      float bubbleX,
-      float bubbleY,
-      float bubbleWidth,
-      float bubbleHeight,
-      Color bgColor,
-      Color borderColor,
-      float alpha
+           VertexConsumer vertexConsumer,
+           Matrix4f matrix4f,
+           float bubbleX,
+           float bubbleY,
+           float bubbleWidth,
+           float bubbleHeight,
+           Color bgColor,
+           Color borderColor,
+           float alpha
    ) {
-      float zBg = -0.04F;
-      float zBorder = -0.03F;
+      float zBg = 0.04F;       // furthest back
+      float zBorder = 0.03F;
       drawNineSlice(vertexConsumer, matrix4f, bubbleX, bubbleY, bubbleWidth, bubbleHeight, 0, 32, alpha, zBg, bgColor.r(), bgColor.g(), bgColor.b());
       drawNineSlice(
-         vertexConsumer, matrix4f, bubbleX, bubbleY, bubbleWidth, bubbleHeight, 0, 0, alpha, zBorder, borderColor.r(), borderColor.g(), borderColor.b()
+              vertexConsumer, matrix4f, bubbleX, bubbleY, bubbleWidth, bubbleHeight, 0, 0, alpha, zBorder, borderColor.r(), borderColor.g(), borderColor.b()
       );
    }
 
    private static void renderArrow(
-      VertexConsumer vertexConsumer, Matrix4f matrix4f, float arrowX, float arrowY, float w, float h, Color bgColor, Color borderColor, float alpha
+           VertexConsumer vertexConsumer, Matrix4f matrix4f, float arrowX, float arrowY, float w, float h, Color bgColor, Color borderColor, float alpha
    ) {
-      float zArrowBg = -0.02F;
-      float zArrowBorder = -0.01F;
+      float zArrowBg = 0.02F;
+      float zArrowBorder = 0.01F;  // text is at z = 0, in front of all of these
       drawQuad(
-         vertexConsumer, matrix4f, arrowX, arrowY, arrowX + w, arrowY + h, 48.0F, 7.0F, 60.0F, 14.0F, alpha, zArrowBg, bgColor.r(), bgColor.g(), bgColor.b()
+              vertexConsumer, matrix4f, arrowX, arrowY, arrowX + w, arrowY + h, 48.0F, 7.0F, 60.0F, 14.0F, alpha, zArrowBg, bgColor.r(), bgColor.g(), bgColor.b()
       );
       drawQuad(
-         vertexConsumer,
-         matrix4f,
-         arrowX,
-         arrowY,
-         arrowX + w,
-         arrowY + h,
-         48.0F,
-         0.0F,
-         60.0F,
-         7.0F,
-         alpha,
-         zArrowBorder,
-         borderColor.r(),
-         borderColor.g(),
-         borderColor.b()
+              vertexConsumer,
+              matrix4f,
+              arrowX,
+              arrowY,
+              arrowX + w,
+              arrowY + h,
+              48.0F,
+              0.0F,
+              60.0F,
+              7.0F,
+              alpha,
+              zArrowBorder,
+              borderColor.r(),
+              borderColor.g(),
+              borderColor.b()
       );
    }
 
    private static void drawNineSlice(
-      VertexConsumer vc, Matrix4f mat, float x, float y, float w, float h, int uOff, int vOff, float alpha, float z, float r, float g, float b
+           VertexConsumer vc, Matrix4f mat, float x, float y, float w, float h, int uOff, int vOff, float alpha, float z, float r, float g, float b
    ) {
       float[] xP = new float[]{x, x + 7.0F, x + w - 7.0F, x + w};
       float[] yP = new float[]{y, y + 7.0F, y + h - 7.0F, y + h};
@@ -194,21 +195,21 @@ public class BubbleRenderer {
       for (int right = 0; right < 3; right++) {
          for (int c = 0; c < 3; c++) {
             drawQuad(
-               vc,
-               mat,
-               xP[c],
-               yP[right],
-               xP[c + 1],
-               yP[right + 1],
-               uU[c] * 64.0F,
-               vV[right] * 64.0F,
-               uU[c + 1] * 64.0F,
-               vV[right + 1] * 64.0F,
-               alpha,
-               z,
-               r,
-               g,
-               b
+                    vc,
+                    mat,
+                    xP[c],
+                    yP[right],
+                    xP[c + 1],
+                    yP[right + 1],
+                    uU[c] * 64.0F,
+                    vV[right] * 64.0F,
+                    uU[c + 1] * 64.0F,
+                    vV[right + 1] * 64.0F,
+                    alpha,
+                    z,
+                    r,
+                    g,
+                    b
             );
          }
       }
@@ -222,49 +223,49 @@ public class BubbleRenderer {
     *  finishes the vertex automatically, which is why the old code had no endVertex.)
     */
    private static void drawQuad(
-      VertexConsumer vc,
-      Matrix4f mat,
-      float x1,
-      float y1,
-      float x2,
-      float y2,
-      float u1,
-      float v1,
-      float u2,
-      float v2,
-      float alpha,
-      float z,
-      float r,
-      float g,
-      float b
+           VertexConsumer vc,
+           Matrix4f mat,
+           float x1,
+           float y1,
+           float x2,
+           float y2,
+           float u1,
+           float v1,
+           float u2,
+           float v2,
+           float alpha,
+           float z,
+           float r,
+           float g,
+           float b
    ) {
       vc.vertex(mat, x1, y1, z)
-         .color(r, g, b, alpha)
-         .uv(u1 / 64.0F, v1 / 64.0F)
-         .overlayCoords(OverlayTexture.NO_OVERLAY)
-         .uv2(15728880)
-         .normal(0.0F, 0.0F, 1.0F)
-         .endVertex();
+              .color(r, g, b, alpha)
+              .uv(u1 / 64.0F, v1 / 64.0F)
+              .overlayCoords(OverlayTexture.NO_OVERLAY)
+              .uv2(15728880)
+              .normal(0.0F, 0.0F, 1.0F)
+              .endVertex();
       vc.vertex(mat, x1, y2, z)
-         .color(r, g, b, alpha)
-         .uv(u1 / 64.0F, v2 / 64.0F)
-         .overlayCoords(OverlayTexture.NO_OVERLAY)
-         .uv2(15728880)
-         .normal(0.0F, 0.0F, 1.0F)
-         .endVertex();
+              .color(r, g, b, alpha)
+              .uv(u1 / 64.0F, v2 / 64.0F)
+              .overlayCoords(OverlayTexture.NO_OVERLAY)
+              .uv2(15728880)
+              .normal(0.0F, 0.0F, 1.0F)
+              .endVertex();
       vc.vertex(mat, x2, y2, z)
-         .color(r, g, b, alpha)
-         .uv(u2 / 64.0F, v2 / 64.0F)
-         .overlayCoords(OverlayTexture.NO_OVERLAY)
-         .uv2(15728880)
-         .normal(0.0F, 0.0F, 1.0F)
-         .endVertex();
+              .color(r, g, b, alpha)
+              .uv(u2 / 64.0F, v2 / 64.0F)
+              .overlayCoords(OverlayTexture.NO_OVERLAY)
+              .uv2(15728880)
+              .normal(0.0F, 0.0F, 1.0F)
+              .endVertex();
       vc.vertex(mat, x2, y1, z)
-         .color(r, g, b, alpha)
-         .uv(u2 / 64.0F, v1 / 64.0F)
-         .overlayCoords(OverlayTexture.NO_OVERLAY)
-         .uv2(15728880)
-         .normal(0.0F, 0.0F, 1.0F)
-         .endVertex();
+              .color(r, g, b, alpha)
+              .uv(u2 / 64.0F, v1 / 64.0F)
+              .overlayCoords(OverlayTexture.NO_OVERLAY)
+              .uv2(15728880)
+              .normal(0.0F, 0.0F, 1.0F)
+              .endVertex();
    }
 }

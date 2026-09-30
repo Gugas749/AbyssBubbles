@@ -16,28 +16,18 @@ import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 
-/**
- * /bubble screen
- * /bubble grant usage <player>
- * /bubble grant config <player>
- * /bubble revoke usage <player>
- * /bubble revoke config <player>
- *
- * Command guard uses AbyssCore's AbyssPermissionHandler (MODERATOR level).
- * Per-player bubble usage/config flags stay in BubblePermissionManager (bubble-specific state).
- */
 public class ABBubbleCommands {
 
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
         dispatcher.register(
             Commands.literal("bubble")
-                .requires(src -> AbyssPermissionHandler.sourceHas(src, AbyssPermissionLevel.MODERATOR))
-
                 .then(Commands.literal("screen")
                     .executes(ABBubbleCommands::executeScreen))
 
                 .then(Commands.literal("grant")
-                    .then(Commands.literal("usage")
+                        .requires(src -> AbyssPermissionHandler.sourceHas(src, AbyssPermissionLevel.MODERATOR))
+
+                        .then(Commands.literal("usage")
                         .then(Commands.argument("player", EntityArgument.player())
                             .executes(ctx -> executeGrantUsage(ctx, EntityArgument.getPlayer(ctx, "player")))))
                     .then(Commands.literal("config")
@@ -45,7 +35,9 @@ public class ABBubbleCommands {
                             .executes(ctx -> executeGrantConfig(ctx, EntityArgument.getPlayer(ctx, "player"))))))
 
                 .then(Commands.literal("revoke")
-                    .then(Commands.literal("usage")
+                        .requires(src -> AbyssPermissionHandler.sourceHas(src, AbyssPermissionLevel.MODERATOR))
+
+                        .then(Commands.literal("usage")
                         .then(Commands.argument("player", EntityArgument.player())
                             .executes(ctx -> executeRevokeUsage(ctx, EntityArgument.getPlayer(ctx, "player")))))
                     .then(Commands.literal("config")

@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/AbyssBubbles.main.iml" filepath="$PROJECT_DIR$/.idea/modules/AbyssBubbles.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/AbyssBubbles.test.iml" filepath="$PROJECT_DIR$/.idea/modules/AbyssBubbles.test.iml" />
     </modules>
   </component>
 </project>
