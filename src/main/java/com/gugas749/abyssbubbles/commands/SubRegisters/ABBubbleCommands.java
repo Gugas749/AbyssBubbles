@@ -31,13 +31,13 @@ public class ABBubbleCommands {
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
         dispatcher.register(
             Commands.literal("bubble")
-                .requires(src -> AbyssPermissionHandler.sourceHas(src, AbyssPermissionLevel.MODERATOR))
-
                 .then(Commands.literal("screen")
                     .executes(ABBubbleCommands::executeScreen))
 
                 .then(Commands.literal("grant")
-                    .then(Commands.literal("usage")
+                        .requires(src -> AbyssPermissionHandler.sourceHas(src, AbyssPermissionLevel.MODERATOR))
+
+                        .then(Commands.literal("usage")
                         .then(Commands.argument("player", EntityArgument.player())
                             .executes(ctx -> executeGrantUsage(ctx, EntityArgument.getPlayer(ctx, "player")))))
                     .then(Commands.literal("config")
@@ -45,7 +45,9 @@ public class ABBubbleCommands {
                             .executes(ctx -> executeGrantConfig(ctx, EntityArgument.getPlayer(ctx, "player"))))))
 
                 .then(Commands.literal("revoke")
-                    .then(Commands.literal("usage")
+                        .requires(src -> AbyssPermissionHandler.sourceHas(src, AbyssPermissionLevel.MODERATOR))
+
+                        .then(Commands.literal("usage")
                         .then(Commands.argument("player", EntityArgument.player())
                             .executes(ctx -> executeRevokeUsage(ctx, EntityArgument.getPlayer(ctx, "player")))))
                     .then(Commands.literal("config")

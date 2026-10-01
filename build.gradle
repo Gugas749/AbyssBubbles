@@ -99,7 +99,7 @@ sourceSets.main.resources { srcDir 'src/generated/resources' }
 
 
 dependencies {
-    implementation 'com.github.Gugas749:AbyssCore-Remake:41f6677ecf'
+    implementation "com.github.Gugas749:AbyssCore-Remake:${abysscore_version}"
     implementation "curse.maven:geckolib-${geckolib_id}:${geckolib_version}"
 }
 
